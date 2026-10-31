@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAM Sawit</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+<div class="login">
+  <div class="login-art hero-art"></div>
+  <form id="loginForm" class="login-card" novalidate>
+    <h1>🌴 RAM Sawit</h1>
+    <p class="muted">Pembelian dan penimbangan kelapa sawit</p>
+    <div class="tabs" id="roleTabs">
+      <button type="button" class="on" data-role="admin">Admin</button>
+      <button type="button" data-role="petani">Petani</button>
+    </div>
+    <label>Username<input id="lUser" autocomplete="username"></label>
+    <label>Password<input id="lPass" type="password" autocomplete="current-password"></label>
+    <p class="err" id="lErr"></p>
+    <button class="btn" type="submit">Masuk</button>
+    <p class="hint" id="lHint"></p>
+  </form>
+</div>
+  <section class="about">
+    <h2>Transparan untuk RAM dan petani</h2>
+    <div class="grid">
+      <div class="stat"><span class="ic">⚖️</span><div><b>Penimbangan akurat</b><small>Berat bersih dan total dihitung otomatis oleh server.</small></div></div>
+      <div class="stat"><span class="ic">💰</span><div><b>Harga jelas</b><small>Harga sawit per kg dan riwayat perubahannya bisa dilihat.</small></div></div>
+      <div class="stat"><span class="ic">🧾</span><div><b>Riwayat pembayaran</b><small>Petani memantau penjualan dan status pembayaran sendiri.</small></div></div>
+    </div>
+  </section>
+  <footer class="foot">© 2026 RAM Sawit · Sistem Informasi Penimbangan, Harga, dan Pembayaran TBS<br>Program Studi Sistem Informasi, Universitas Widya Dharma Pontianak</footer>
+</div>
+
+<!-- APLIKASI -->
+<div id="app" hidden>
+  <aside id="sidebar">
+    <div class="brand">🌴 RAM Sawit</div>
+    <nav id="nav"></nav>
+    <button class="btn ghost" id="logout">Keluar</button>
+  </aside>
+  <div id="overlay"></div>
+
+  <main>
+    <header class="top">
+      <button id="menuBtn" aria-label="Buka menu">☰</button>
+      <h2 id="title"></h2>
+      <span id="who" class="chip"></span>
+    </header>
+
+    <!-- 1. DASHBOARD -->
+    <section class="page" id="page-dashboard">
+      <div class="hero">
+        <div class="hero-art"></div>
+        <div class="hero-text"><h3>Harga sawit hari ini</h3><p><b id="dHarga"></b> per kg</p></div>
+      </div>
+      <div class="grid" id="dStats"></div>
+      <div class="card">
+        <div class="row"><h3>Grafik pembelian (kg)</h3>
+          <div class="tabs sm" id="dTabs"><button class="on" data-m="d">Harian</button><button data-m="w">Mingguan</button></div></div>
+        <div class="chart" id="dChart"></div>
+      </div>
+      <div class="card"><h3>Transaksi terbaru</h3><div class="tw"><table id="dRecent"></table></div></div>
+    </section>
+
+    <!-- 2. TRANSAKSI -->
+    <section class="page" id="page-transaksi">
+      <form id="txForm" class="card form" novalidate>
+        <label>No. transaksi<input id="fNo" readonly></label>
+        <label>Tanggal dan waktu<input id="fDt" type="datetime-local" readonly></label>
+        <label>Nama petani<select id="fPetani"></select></label>
+        <label>No. HP<input id="fHp" readonly></label>
+        <label>No. kendaraan<input id="fKend" placeholder="BM 1234 AB"></label>
+        <label>Berat kotor (kg)<input id="fGross" type="number" min="0" step="any"></label>
+        <label>Berat kosong kendaraan (kg)<input id="fTare" type="number" min="0" step="any"></label>
+        <label>Berat bersih (kg)<input id="fNet" readonly></label>
+        <label>Harga sawit/kg<input id="fHarga" readonly></label>
+        <label>Potongan (Rp)<input id="fCut" type="number" min="0" value="0"></label>
+        <label>Metode pembayaran<select id="fMetode"><option>Tunai</option><option>Transfer</option></select></label>
+        <div class="total">Total pembayaran<b id="fTotal">Rp 0</b></div>
+        <p class="err full" id="fErr"></p>
+        <div class="actions full">
+          <button class="btn" type="submit">Simpan transaksi</button>
+          <button class="btn ghost" type="button" id="btnStruk" disabled>Cetak struk</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 3. DATA PETANI -->
+    <section class="page" id="page-petani">
+      <div class="card">
+        <div class="row"><input id="pSearch" class="search" placeholder="Cari petani...">
+          <button class="btn" id="pAdd">Tambah petani</button></div>
+        <div class="tw"><table id="pTable"></table></div>
+      </div>
+    </section>
+
+    <!-- 4. HARGA -->
+    <section class="page" id="page-harga">
+      <div class="grid">
+        <div class="stat"><span class="ic">💰</span><div><small>Harga hari ini</small><b id="hNow"></b></div></div>
+        <div class="stat"><span class="ic">📅</span><div><small>Berlaku sejak</small><b id="hDate"></b></div></div>
+        <div class="stat"><span class="ic">↩️</span><div><small>Harga sebelumnya</small><b id="hPrev"></b></div></div>
+      </div>
+      <form id="hForm" class="card form" novalidate>
+        <label>Harga baru per kg (Rp)<input id="hPrice" type="number" min="1"></label>
+        <label>Tanggal berlaku<input id="hTgl" type="date"></label>
+        <p class="err full" id="hErr"></p>
+        <div class="actions full"><button class="btn" type="submit">Simpan harga</button></div>
+      </form>
+      <div class="card"><h3>Riwayat perubahan harga</h3><div class="tw"><table id="hTable"></table></div></div>
+    </section>
+
+    <!-- 5. RIWAYAT -->
+    <section class="page" id="page-riwayat">
+      <div class="card">
+        <div class="filters">
+          <input id="rQ" class="search" placeholder="Cari no. transaksi / petani / kendaraan">
+          <input id="rFrom" type="date" aria-label="Dari tanggal">
+          <input id="rTo" type="date" aria-label="Sampai tanggal">
+          <select id="rPetani"></select>
+          <button class="btn ghost" id="rReset">Reset</button>
+          <button class="btn" id="rPrint">Cetak laporan</button>
+        </div>
+        <div class="tw"><table id="rTable"></table></div>
+      </div>
+    </section>
+
+    <!-- 6. LAPORAN -->
+    <section class="page" id="page-laporan">
+      <div class="card filters">
+        <select id="lType"><option value="d">Harian</option><option value="w">Mingguan (7 hari)</option><option value="m">Bulanan</option></select>
+        <input id="lDate" type="date" aria-label="Tanggal acuan">
+        <button class="btn" id="lPrint">Cetak laporan</button>
+      </div>
+      <div class="grid" id="lStats"></div>
+      <div class="card"><h3>Grafik berat sawit (kg)</h3><div class="chart" id="lChart"></div></div>
+      <div class="card"><h3>Rincian per hari</h3><div class="tw"><table id="lTable"></table></div></div>
+    </section>
+
+    <!-- 7. PORTAL PETANI -->
+    <section class="page" id="page-portal">
+      <div class="hero"><div class="hero-art"></div>
+        <div class="hero-text"><h3 id="ptName"></h3><p>Harga sawit hari ini <b id="ptHarga"></b> per kg</p></div></div>
+      <div class="grid" id="ptStats"></div>
+      <div class="card"><h3>Riwayat penjualan saya</h3><div class="tw"><table id="ptTable"></table></div></div>
+    </section>
+    <footer class="foot">© 2026 RAM Sawit · Sistem Informasi Penimbangan TBS</footer>
+  </main>
+</div>
+
+<!-- MODAL PETANI -->
+<div id="modal" class="modal" hidden>
+  <form id="mForm" class="card form" novalidate>
+    <h3 class="full" id="mTitle">Tambah petani</h3>
+    <input type="hidden" id="mId">
+    <label>Nama petani<input id="mName"></label>
+    <label>No. HP<input id="mHp" placeholder="08xxxxxxxxxx"></label>
+    <label class="full">Alamat<input id="mAddr"></label>
+    <p class="err full" id="mErr"></p>
+    <div class="actions full">
+      <button class="btn" type="submit">Simpan petani</button>
+      <button class="btn ghost" type="button" id="mCancel">Batal</button>
+    </div>
+  </form>
+</div>
+
+<div id="toast" role="status"></div>
+<div id="printArea"></div>
+<script src="script.js"></script>
+</body>
+</html>
